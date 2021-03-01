@@ -85,30 +85,27 @@ def apply_sobel_y(image, greyscale, sobel_question):
 # and see if that pixel is bigger than the neighbourhood. If it is, then keep it
 
 def harris_detection(image):
-    sobel_x = apply_sobel_x(image, greyscale=True, sobel_question=True)
-    sobel_y = apply_sobel_y(image, greyscale=True, sobel_question=True)
-    alpha = 0.05
-    threshold = 10287891.2  # Max for Yosemite1.jpg
+    grey_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    sobel_x = cv.Sobel(grey_image, cv.CV_64F, 1, 0, ksize=5)
+    sobel_y = cv.Sobel(grey_image, cv.CV_64F, 0, 1, ksize=5)
+    alpha = 0.06
+    threshold = 619623619.2  # Max for Yosemite1.jpg = 2919623619.2
 
     sobel_x_square = np.multiply(sobel_x, sobel_x)
     sobel_y_square = np.multiply(sobel_y, sobel_y)
     sobel_xy_square = np.multiply(sobel_x, sobel_y)
 
-    gauss_sobel_x_square = apply_gaussian_blur(sobel_x_square, 3)
-    gauss_sobel_y_square = apply_gaussian_blur(sobel_y_square, 3)
-    gauss_sobel_xy_square = apply_gaussian_blur(sobel_xy_square, 3)
     responses = np.zeros((image.shape[0], image.shape[1]))
     key_points = []
 
     for y in range(5, image.shape[0]):
         for x in range(5, image.shape[1]):
-            neighbourhoodx = gauss_sobel_x_square[y - 2: y + 3, x - 2:x + 3]
-            neighbourhoody = gauss_sobel_y_square[y - 2: y + 3, x - 2:x + 3]
+            neighbourhoodx = sobel_x[y - 2: y + 3, x - 2:x + 3]
+            neighbourhoody = sobel_y[y - 2: y + 3, x - 2:x + 3]
 
             eigenIx = np.sum(neighbourhoodx)
             eigenIy = np.sum(neighbourhoody)
 
-            harris_matrix = np.array([[eigenIx, 0], [0, eigenIy]])
             response = (eigenIx * eigenIy) - alpha * ((eigenIx + eigenIy) ** 2)
 
             if response > threshold:
@@ -135,9 +132,9 @@ def harris_detection(image):
     key_points_image = cv.drawKeypoints(original_image, key_points, original_image)
 
     cv.imshow("Keypoints Image", key_points_image)
-    cv.imshow("Sobel X", gauss_sobel_x_square)
-    cv.imshow("Sobel y", gauss_sobel_y_square)
-    cv.imshow("Sobel xy", gauss_sobel_xy_square)
+    cv.imshow("Sobel X", sobel_x_square)
+    cv.imshow("Sobel Y", sobel_y_square)
+    cv.imshow("Sobel XY", sobel_xy_square)
     cv.imshow("Response", response_image)
     cv.imshow("Harris Non-Max", harris_max_suppress)
     cv.waitKey(0)
