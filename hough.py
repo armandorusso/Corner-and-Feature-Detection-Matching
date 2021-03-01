@@ -61,7 +61,7 @@ def apply_hough(image):
     bside = np.square(image.shape[1])
     sum = aside + bside
     hypo = int(np.sqrt(sum))
-    threshold = 15
+    threshold = 100  # 15 for hough1.png, 100 for hough2.png
 
     hough_space = np.zeros((hypo, 180))
     polar_coordinate = []
@@ -76,6 +76,8 @@ def apply_hough(image):
                     hough_space[d, theta] += 1
                     polar_coordinate.append((d, theta))
 
+    print("Max Value in Hough Space: ", hough_space.max())
+
     for d in range(hough_space.shape[0]):
         for angle in range(hough_space.shape[1]):
             if hough_space[d, angle] > threshold:
@@ -88,7 +90,7 @@ def apply_hough(image):
                 y1 = int(y0 + 1000 * (aline))
                 x2 = int(x0 - 1000 * (-bline))
                 y2 = int(y0 - 1000 * (aline))
-                cv.line(original_image, (x1, y1), (x2, y2), (255, 100, 255), 2)
+                cv.line(original_image, (x1, y1), (x2, y2), (255, 100, 255), 1)
 
     print(hough_space)
     hough_graph = np.divide(hough_space, 255)
@@ -97,7 +99,7 @@ def apply_hough(image):
     cv.imshow('Hough Space', hough_graph)
 
 
-original_image = cv.imread("hough1.png")
+original_image = cv.imread("hough2.png")
 
 
 def main():
