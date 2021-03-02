@@ -123,6 +123,8 @@ def harris_detection(image):
             neighbourhood = responses[y - 2: y + 3, x - 2:x + 3]
             if responses[y, x] == neighbourhood.max():
                 harris_max_suppress[y, x] = responses[y, x]
+            else:
+                responses[y, x] = 0
 
     for y in range(5, image.shape[0]):
         for x in range(5, image.shape[1]):
@@ -136,7 +138,6 @@ def harris_detection(image):
     cv.imshow("Sobel Y", sobel_y_square)
     cv.imshow("Sobel XY", sobel_xy_square)
     cv.imshow("Response", response_image)
-    cv.imshow("Harris Non-Max", harris_max_suppress)
     cv.waitKey(0)
 
 
