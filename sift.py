@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import math
 
 
 def harris_detection(image):
@@ -55,23 +56,68 @@ def harris_detection(image):
     return key_points, key_points_image
 
 
+def calculate_image_gradients(image):
+    magnitudes = np.zeros(image.shape)
+    orientations = np.zeros(image.shape)
+
+    for y in range(1, image.shape[0] - 1):
+        for x in range(1, image.shape[1] - 1):
+            sum_squares = np.square((image[y, x + 1] - image[y, x - 1])) + np.square((image[y + 1, x] - image[y - 1, x]))
+            magnitude = np.sqrt(sum_squares)
+            orientation = math.atan2((image[y + 1, x] - image[y - 1, x]), (image[y, x + 1] - image[y, x - 1]))
+            orientation = np.rad2deg(orientation)
+            magnitudes[y, x] = magnitude
+            orientations[y, x] = orientation
+
+    return magnitudes, orientations
+
+
 def perform_sift(image1, keypoints1, image2, keypoints2):
     keypoint_pixels1 = cv.KeyPoint_convert(keypoints1)
     keypoint_pixels2 = cv.KeyPoint_convert(keypoints2)
+    keypoint_histogram1 = []
+    keypoint_histogram2 = []
 
-
+    magnitudes1, orientations1 = calculate_image_gradients(image1)
+    magnitudes2, orientations2 = calculate_image_gradients(image2)
 
     for keypoint in keypoints1:
         xcoord = int(keypoint.pt[0])
         ycoord = int(keypoint.pt[1])
-        neighborhood_16 = image1[ycoord - 7: ycoord + 9, xcoord - 7:xcoord + 9]
+
+        neighborhood_16 = orientations1[ycoord - 7: ycoord + 9, xcoord - 7:xcoord + 9]
         print("Neighborhood size", neighborhood_16.shape)
 
+
         # Obtaining the 16 cells in the neighborhood
-        cells = []
         for y in range(1, neighborhood_16.shape[0], 4):
             for x in range(1, neighborhood_16.shape[1], 4):
-                cells.append(neighborhood_16[y - 1: y + 3, x - 1: x + 3])
+                cell = neighborhood_16[y - 1: y + 3, x - 1: x + 3]
+                bins = np.zeros(8)
+                for orientation in cell:
+                    bins[int(orientation // 45)] += 1
+                keypoint_histogram1.append(bins)
+
+    for keypoint in keypoints2:
+        xcoord = int(keypoint.pt[0])
+        ycoord = int(keypoint.pt[1])
+
+        neighborhood_16 = orientations1[ycoord - 7: ycoord + 9, xcoord - 7:xcoord + 9]
+        print("Neighborhood size", neighborhood_16.shape)
+
+
+        # Obtaining the 16 cells in the neighborhood
+        for y in range(1, neighborhood_16.shape[0], 4):
+            for x in range(1, neighborhood_16.shape[1], 4):
+                cell = neighborhood_16[y - 1: y + 3, x - 1: x + 3]
+                bins = np.zeros(8)
+                for orientation in cell:
+                    bins[orientation // 45] += 1
+                keypoint_histogram2.append(bins)
+
+
+
+
 
 
 
