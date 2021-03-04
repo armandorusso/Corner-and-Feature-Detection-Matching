@@ -104,9 +104,9 @@ def perform_sift(image1, keypoints1, image2, keypoints2):
         ratio_distance = ssdmin / ssdminprime
 
         if ratio_distance < 0.8:
-            best_matches.append(cv.DMatch(keypoint_coords2[best_match_index][0], keypoint_coords2[best_match_index][1], 0))
+            best_matches.append(cv.DMatch(x, best_match_index, 0))
 
-    matched_image = cv.drawMatches(image1, keypoints1, image2, keypoints2, best_matches, original_image1, flags=2)
+    matched_image = cv.drawMatches(image1, keypoints1, image2, keypoints2, best_matches, image1, flags=2)
     cv.imshow("Matches", matched_image)
 
 
@@ -116,7 +116,7 @@ def create_descriptor(keypoint_descriptors1, keypoint_histogram1, keypoints1, or
     for keypoint in keypoints1:
         xcoord = int(keypoint.pt[0])
         ycoord = int(keypoint.pt[1])
-        keypoint_coord = (ycoord, xcoord)  # Maybe reverse these?
+        keypoint_coord = (xcoord, ycoord)  # Maybe reverse these?
         keypoint_coords.append(keypoint_coord)
         descriptor = np.array(list())
 
@@ -140,10 +140,10 @@ def create_descriptor(keypoint_descriptors1, keypoint_histogram1, keypoints1, or
         # If the descriptor is not of 128 length, it means it's a feature at the edge of the image (meaning we can't
         # get the 16x16 window)
         if descriptor.shape[0] < 128:
-            continue
+            descriptor = np.resize(descriptor, (128))
 
         normal = np.linalg.norm(descriptor)
-        descriptor = descriptor / normal
+        descriptor = np.divide(descriptor, normal)
         threshold_descriptor = np.array(descriptor)
 
         for i in range(descriptor.shape[0]):
@@ -153,7 +153,7 @@ def create_descriptor(keypoint_descriptors1, keypoint_histogram1, keypoints1, or
                 threshold_descriptor[i] = 0
 
         normal_again = np.linalg.norm(threshold_descriptor)
-        threshold_descriptor = threshold_descriptor / normal_again
+        threshold_descriptor = np.divide(threshold_descriptor, normal_again)
         keypoint_descriptors1.append(threshold_descriptor)
 
     return keypoint_descriptors1, keypoint_coords
