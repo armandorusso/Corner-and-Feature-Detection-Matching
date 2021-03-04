@@ -12,3 +12,5 @@ An assignment for my Computer Vision class! We were tasked to create the followi
 **SIFT:** Scale Invariance Feature Transform detects feature matches using 2 images. Matching is currently not accurate, however it does calculate feature descriptors properly.
 
 **Keys:** Press Esc to close all windows
+
+**Notes:** `harrisandmatching.py` is a combination of `harris_detection.py` and `sift.py`. This was done for submission purposes.
