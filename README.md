@@ -8,4 +8,4 @@
 
 **Keys:** Press Esc to close all windows
 
-**Notes:** `harrisandmatching.py` is a combination of `harris_detection.py` and `sift.py`. This was done for submission purposes.
+**Notes:** `harrisandmatching.py` is a combination of `harris_detection.py` and `sift.py`.
