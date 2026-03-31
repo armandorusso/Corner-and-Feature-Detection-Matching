@@ -1,9 +1,4 @@
-Computer Vision Assignment 2
-Submitted by:
-Armando Russo
-ID: 40076164
-
-An assignment for my Computer Vision class! We were tasked to create the following algorithms from scratch:
+# **Corner and Feature Detection Matching**
 
 **Hough Lines:** Draws lines where edges are detected
 
